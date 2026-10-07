@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Persona {
+  id              Int       @id
+  municipio       String    @default("")
+  institucion     String    @default("")
+  sede            String    @default("")
+  grupo           String    @default("")
+  cargo           String    @default("")
+  nombre          String    @default("")
+  cedula          String    @default("")
+  vinculacion     String    @default("")
+  fechaNacimiento String    @default("")
+  novedadAnterior String    @default("")
+  updatedAt       DateTime  @updatedAt
+  novedades       Novedad[]
+
+  @@index([grupo])
+  @@index([municipio])
+  @@index([institucion])
+  @@index([vinculacion])
+}
+
+model Novedad {
+  id             String   @id @default(cuid())
+  personaId      Int
+  persona        Persona  @relation(fields: [personaId], references: [id], onDelete: Cascade)
+  fechaRegistro  String   @default("")
+  tipo           String   @default("")
+  clase          String   @default("")
+  desde          String?
+  hasta          String?
+  dias           Int?
+  necesidad      String   @default("")
+  estado         String   @default("Pendiente")
+  requiereAccion Boolean  @default(false)
+  observacion    String   @default("")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([estado])
+  @@index([requiereAccion])
+  @@index([tipo])
+}
