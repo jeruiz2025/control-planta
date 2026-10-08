@@ -44,3 +44,6 @@ next-env.d.ts
 /prisma/*.db
 /prisma/*.db-journal
 /prisma/*.db-wal
+
+# logs de ejecución
+/server.log

@@ -78,6 +78,53 @@ export type Estadisticas = {
   porRangoEdad: { rango: string; total: number }[];
   novedadesPorEstado: { estado: string; total: number }[];
   novedadesPorTipo: { tipo: string; total: number; porAtender: number }[];
+  vacantes: {
+    total: number;
+    definitivas: number;
+    temporales: number;
+    porMunicipio: { nombre: string; total: number }[];
+    porGrupo: { nombre: string; total: number }[];
+  };
+  retiros: { anio: number; total: number }[];
+  perfilEdad: {
+    promedio: number | null;
+    mediana: number | null;
+    pct55: number;
+    pct60: number;
+    base: number;
+    porGrupo: { nombre: string; total: number }[];
+    porMunicipio: { nombre: string; total: number }[];
+  };
+  ausentismo: {
+    dias: number;
+    anioActual: number;
+    diasActuales: number;
+    indiceAnual: number | null;
+    diasPorAnio: { nombre: string; total: number }[];
+    topInstituciones: { nombre: string; total: number }[];
+  };
+  gestionNovedades: {
+    total: number;
+    pendientes: number;
+    cubiertas: number;
+    pctCubiertas: number;
+    diasPromedioPendiente: number | null;
+    tipoMasFrecuente: string | null;
+  };
+  topProblemas: {
+    municipio: string;
+    institucion: string;
+    vacantes: number;
+    novedades: number;
+    total: number;
+  }[];
+  calidadDatos: {
+    sinFechaNacimiento: number;
+    sinCedula: number;
+    imposibles: number;
+    incompletos: number;
+    pctCompleto: number;
+  };
   actualizado: string;
 };
 

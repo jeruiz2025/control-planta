@@ -26,6 +26,10 @@ export const CLASES: Record<string, string> = {
 
 export const ESTADOS = ["Pendiente", "En trámite", "Cubierta", "No requiere"];
 
+export const TIPOS_AUSENCIA = ["Licencia", "Incapacidad", "Permiso sindical"];
+
+export const DIAS_HABILES_ANIO = 250;
+
 export const DIAS_MINIMO_REEMPLAZO = 15;
 
 export const VIABILIZADAS: Record<string, number> = {
