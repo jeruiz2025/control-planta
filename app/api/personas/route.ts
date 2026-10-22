@@ -49,6 +49,13 @@ export async function POST(req: NextRequest) {
         vinculacion: String(body.vinculacion ?? "").trim(),
         fechaNacimiento: aISO(body.fechaNacimiento),
         novedadAnterior: String(body.novedadAnterior ?? "").trim(),
+        direccion: String(body.direccion ?? "").trim(),
+        telefono: String(body.telefono ?? "").trim(),
+        correo: String(body.correo ?? "").trim(),
+        nivel: String(body.nivel ?? "").trim(),
+        area: String(body.area ?? "").trim(),
+        tipoInstitucion: String(body.tipoInstitucion ?? "").trim(),
+        autoriza: body.autoriza === undefined ? true : Boolean(body.autoriza),
       },
     });
     return Response.json(aPersonaDTO(creada), { status: 201 });

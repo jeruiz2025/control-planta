@@ -41,6 +41,12 @@ const CAMPOS = [
   "cedula",
   "vinculacion",
   "novedadAnterior",
+  "direccion",
+  "telefono",
+  "correo",
+  "nivel",
+  "area",
+  "tipoInstitucion",
 ] as const;
 
 export async function PUT(req: NextRequest, ctx: RouteContext<"/api/personas/[id]">) {
@@ -72,7 +78,9 @@ export async function PUT(req: NextRequest, ctx: RouteContext<"/api/personas/[id
     if (body.fechaNacimiento !== undefined) {
       datos.fechaNacimiento = aISO(body.fechaNacimiento);
     }
-    const actualizada = await prisma.persona.update({ where: { id }, data: datos });
+    const data: Record<string, string | boolean> = { ...datos };
+    if (body.autoriza !== undefined) data.autoriza = Boolean(body.autoriza);
+    const actualizada = await prisma.persona.update({ where: { id }, data });
     return Response.json(aPersonaDTO(actualizada));
   } catch (e) {
     console.error(e);

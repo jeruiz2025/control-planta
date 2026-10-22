@@ -236,6 +236,7 @@ export async function calcularEstadisticas(): Promise<Estadisticas> {
   const edades: number[] = [];
   const anioActual = new Date().getFullYear();
   let mayores65 = 0;
+  let mayores70 = 0;
   let proximos65 = 0;
   let provisionales = 0;
   let vacDefinitivas = 0;
@@ -299,6 +300,7 @@ export async function calcularEstadisticas(): Promise<Estadisticas> {
       mayores65 += 1;
       inst.mayores65 += 1;
     }
+    if (p.edad !== null && p.edad >= 70) mayores70 += 1;
     if (p.edad !== null && p.edad >= 64 && p.edad < 65) proximos65 += 1;
     if (p.edad !== null && p.edad < 65 && p.fechaNacimiento.length >= 4) {
       const anio65 = Number(p.fechaNacimiento.slice(0, 4)) + 65;
@@ -448,6 +450,7 @@ export async function calcularEstadisticas(): Promise<Estadisticas> {
     viabilizadas,
     diferenciaViabilizacion,
     mayores65,
+    mayores70,
     proximos65,
     provisionalesVacanteDefinitiva: provisionales,
     novedadesPorAtender,

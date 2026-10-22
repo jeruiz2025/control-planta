@@ -19,6 +19,13 @@ model Persona {
   vinculacion     String    @default("")
   fechaNacimiento String    @default("")
   novedadAnterior String    @default("")
+  direccion       String    @default("")
+  telefono        String    @default("")
+  correo          String    @default("")
+  nivel           String    @default("")
+  area            String    @default("")
+  tipoInstitucion String    @default("")
+  autoriza        Boolean   @default(true)
   updatedAt       DateTime  @updatedAt
   novedades       Novedad[]
 
@@ -26,6 +33,22 @@ model Persona {
   @@index([municipio])
   @@index([institucion])
   @@index([vinculacion])
+}
+
+model Consecutivo {
+  clave  String @id
+  valor  Int    @default(0)
+}
+
+model Usuario {
+  id        Int      @id @default(autoincrement())
+  usuario   String   @unique
+  nombre    String   @default("")
+  hash      String
+  rol       String   @default("usuario")
+  activo    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Novedad {

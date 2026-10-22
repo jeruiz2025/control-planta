@@ -34,11 +34,18 @@ export default function PersonaModal({
     vinculacion: persona?.vinculacion ?? "",
     fechaNacimiento: persona?.fechaNacimiento ?? "",
     novedadAnterior: persona?.novedadAnterior ?? "",
+    direccion: persona?.direccion ?? "",
+    telefono: persona?.telefono ?? "",
+    correo: persona?.correo ?? "",
+    nivel: persona?.nivel ?? "",
+    area: persona?.area ?? "",
+    tipoInstitucion: persona?.tipoInstitucion ?? "",
+    autoriza: persona?.autoriza ?? true,
   });
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState("");
 
-  const set = (campo: keyof typeof form, valor: string) =>
+  const set = (campo: keyof typeof form, valor: string | boolean) =>
     setForm((f) => ({ ...f, [campo]: valor }));
 
   const edad = calcularEdad(form.fechaNacimiento);
@@ -225,6 +232,94 @@ export default function PersonaModal({
               value={form.novedadAnterior}
               onChange={(e) => set("novedadAnterior", e.target.value)}
             />
+          </div>
+          <div className="sm:col-span-2">
+            <label className={etiqueta} htmlFor="direccion">
+              Dirección
+            </label>
+            <input
+              id="direccion"
+              className={campoBase}
+              value={form.direccion}
+              onChange={(e) => set("direccion", e.target.value)}
+            />
+          </div>
+          <div>
+            <label className={etiqueta} htmlFor="telefono">
+              Teléfono celular
+            </label>
+            <input
+              id="telefono"
+              className={campoBase}
+              value={form.telefono}
+              onChange={(e) => set("telefono", e.target.value)}
+            />
+          </div>
+          <div>
+            <label className={etiqueta} htmlFor="correo">
+              Correo electrónico
+            </label>
+            <input
+              id="correo"
+              type="email"
+              className={campoBase}
+              value={form.correo}
+              onChange={(e) => set("correo", e.target.value)}
+            />
+          </div>
+          <div>
+            <label className={etiqueta} htmlFor="nivel">
+              Nivel
+            </label>
+            <input
+              id="nivel"
+              className={campoBase}
+              list="lista-niveles"
+              value={form.nivel}
+              onChange={(e) => set("nivel", e.target.value)}
+            />
+            <datalist id="lista-niveles">
+              {["Preescolar", "Básica primaria", "Básica secundaria", "Media técnica", "Media académica"].map((n) => (
+                <option key={n} value={n} />
+              ))}
+            </datalist>
+          </div>
+          <div>
+            <label className={etiqueta} htmlFor="area">
+              Área
+            </label>
+            <input
+              id="area"
+              className={campoBase}
+              value={form.area}
+              onChange={(e) => set("area", e.target.value)}
+            />
+          </div>
+          <div>
+            <label className={etiqueta} htmlFor="tipoInstitucion">
+              Tipo de establecimiento
+            </label>
+            <select
+              id="tipoInstitucion"
+              className={campoBase}
+              value={form.tipoInstitucion}
+              onChange={(e) => set("tipoInstitucion", e.target.value)}
+            >
+              <option value="">—</option>
+              <option value="IE">Institución Educativa (IE)</option>
+              <option value="CE">Centro Educativo (CE)</option>
+            </select>
+          </div>
+          <div className="flex items-center gap-2 pt-5">
+            <input
+              id="autoriza"
+              type="checkbox"
+              checked={form.autoriza}
+              onChange={(e) => set("autoriza", e.target.checked)}
+            />
+            <label className="text-xs text-slate-600" htmlFor="autoriza">
+              Autoriza notificación por correo
+            </label>
           </div>
         </div>
 

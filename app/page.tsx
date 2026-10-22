@@ -122,12 +122,18 @@ export default function Dashboard() {
         </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-7">
         <TarjetaKPI etiqueta="Total planta" valor={nf(datos.totalPersonas)} />
         <TarjetaKPI
           etiqueta="65 años o más"
           valor={nf(datos.mayores65)}
           detalle="Revisar retiro forzoso"
+          tono="rose"
+        />
+        <TarjetaKPI
+          etiqueta="70 años o más"
+          valor={nf(datos.mayores70)}
+          detalle={`De los ${nf(datos.mayores65)} con 65+`}
           tono="rose"
         />
         <TarjetaKPI

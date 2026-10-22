@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import DetallePersonaModal from "@/components/DetallePersonaModal";
 import NovedadModal from "@/components/NovedadModal";
 import PersonaModal from "@/components/PersonaModal";
+import { generarActaPosesion } from "@/lib/actaPosesion";
 import { api } from "@/lib/cliente";
 import type {
   Catalogos,
@@ -78,6 +79,7 @@ export default function PersonasPage() {
   const [editando, setEditando] = useState<PersonaDTO | null>(null);
   const [alta, setAlta] = useState(false);
   const [novedadDe, setNovedadDe] = useState<PersonaDTO | null>(null);
+  const [generandoAp, setGenerandoAp] = useState<number | null>(null);
 
   useEffect(() => {
     api<Catalogos>("/api/catalogos").then(setCatalogos).catch(() => undefined);
@@ -361,22 +363,60 @@ export default function PersonasPage() {
                     <td className="text-center tabular-nums">
                       {p._count?.novedades ?? 0}
                     </td>
-                    <td className="text-right" onClick={(e) => e.stopPropagation()}>
-                      <button
-                        type="button"
-                        onClick={() => setDetalleId(p.id)}
-                        className="mr-1 rounded border border-slate-300 px-2 py-0.5 text-[11px] text-slate-600 hover:bg-slate-50"
-                      >
-                        Ver
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setEditando(p)}
-                        className="rounded border border-blue-300 px-2 py-0.5 text-[11px] text-blue-700 hover:bg-blue-50"
-                      >
-                        Editar
-                      </button>
-                    </td>
+                     <td className="text-right" onClick={(e) => e.stopPropagation()}>
+                       <button
+                         type="button"
+                         onClick={() => setDetalleId(p.id)}
+                         className="mr-1 rounded border border-slate-300 px-2 py-0.5 text-[11px] text-slate-600 hover:bg-slate-50"
+                       >
+                         Ver
+                       </button>
+                       <button
+                         type="button"
+                         disabled={generandoAp === p.id}
+                         onClick={async () => {
+                           setGenerandoAp(p.id);
+                           try {
+                             const { valor } = await api<{ valor: number }>(
+                               "/api/consecutivos",
+                               {
+                                 method: "POST",
+                                 body: JSON.stringify({ clave: "actaPosesion" }),
+                               }
+                             );
+                             await generarActaPosesion({
+                               numero: valor,
+                               nombre: p.nombre,
+                               cedula: p.cedula,
+                               direccion: p.direccion,
+                               municipio: p.municipio,
+                               telefono: p.telefono,
+                               correo: p.correo,
+                               autoriza: p.autoriza,
+                               cargo: p.cargo,
+                               nivel: p.nivel,
+                               area: p.area,
+                               tipoInstitucion: p.tipoInstitucion === "IE" || p.tipoInstitucion === "CE" ? p.tipoInstitucion : null,
+                               institucion: p.institucion,
+                             });
+                           } catch {
+                             alert("No se pudo generar el PDF AP");
+                           } finally {
+                             setGenerandoAp(null);
+                           }
+                         }}
+                         className="mr-1 rounded border border-indigo-300 px-2 py-0.5 text-[11px] text-indigo-700 hover:bg-indigo-50 disabled:opacity-50"
+                       >
+                         {generandoAp === p.id ? "Generando…" : "AP"}
+                       </button>
+                       <button
+                         type="button"
+                         onClick={() => setEditando(p)}
+                         className="rounded border border-blue-300 px-2 py-0.5 text-[11px] text-blue-700 hover:bg-blue-50"
+                       >
+                         Editar
+                       </button>
+                     </td>
                   </tr>
                 ))
               )}
@@ -459,26 +499,28 @@ export default function PersonasPage() {
         />
       )}
 
-      {novedadDe && catalogos && (
-        <NovedadModal
-          personaInicial={{
-            id: novedadDe.id,
-            nombre: novedadDe.nombre,
-            cedula: novedadDe.cedula,
-            municipio: novedadDe.municipio,
-            institucion: novedadDe.institucion,
-            cargo: novedadDe.cargo,
-            grupo: novedadDe.grupo,
-          }}
-          catalogos={catalogos}
-          onCerrar={() => setNovedadDe(null)}
-          onGuardado={(n: NovedadDTO) => {
-            setNovedadDe(null);
-            void cargar();
-            setDetalleId(n.personaId);
-          }}
-        />
-      )}
-    </div>
-  );
-}
+       {novedadDe && catalogos && (
+         <NovedadModal
+           personaInicial={{
+             id: novedadDe.id,
+             nombre: novedadDe.nombre,
+             cedula: novedadDe.cedula,
+             municipio: novedadDe.municipio,
+             institucion: novedadDe.institucion,
+             cargo: novedadDe.cargo,
+             grupo: novedadDe.grupo,
+           }}
+           catalogos={catalogos}
+           onCerrar={() => setNovedadDe(null)}
+           onGuardado={(n: NovedadDTO) => {
+             setNovedadDe(null);
+             void cargar();
+             setDetalleId(n.personaId);
+           }}
+         />
+       )}
+
+
+     </div>
+   );
+ }

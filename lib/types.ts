@@ -10,6 +10,13 @@ export type PersonaRegistro = {
   vinculacion: string;
   fechaNacimiento: string;
   novedadAnterior: string;
+  direccion: string;
+  telefono: string;
+  correo: string;
+  nivel: string;
+  area: string;
+  tipoInstitucion: string;
+  autoriza: boolean;
   updatedAt: Date;
   _count?: { novedades: number };
 };
@@ -26,6 +33,13 @@ export type PersonaDTO = {
   vinculacion: string;
   fechaNacimiento: string;
   novedadAnterior: string;
+  direccion: string;
+  telefono: string;
+  correo: string;
+  nivel: string;
+  area: string;
+  tipoInstitucion: string;
+  autoriza: boolean;
   edad: number | null;
   alerta: string;
   updatedAt: string;
@@ -68,6 +82,7 @@ export type Estadisticas = {
   viabilizadas: Record<string, number>;
   diferenciaViabilizacion: Record<string, number>;
   mayores65: number;
+  mayores70: number;
   proximos65: number;
   provisionalesVacanteDefinitiva: number;
   novedadesPorAtender: number;

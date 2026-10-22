@@ -1,0 +1,26 @@
+
+> control-planta@0.1.0 dev
+> next dev
+
+▲ Next.js 16.4.0 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.1.88:3000
+- Environments: .env
+✓ Ready in 2.2s
+✓ Running next.config.ts took 214ms
+
+ GET / 200 in 1230ms (next.js: 608ms, application-code: 622ms)
+ GET /personas 200 in 182ms (next.js: 57ms, application-code: 124ms)
+ GET /api/personas 200 in 679ms (next.js: 161ms, application-code: 518ms)
+ GET /api/personas 200 in 244ms (next.js: 3ms, application-code: 241ms)
+ GET / 200 in 91ms (next.js: 8ms, application-code: 83ms)
+ GET /api/novedades?requiereAccion=1&porPagina=5 200 in 180ms (next.js: 57ms, application-code: 123ms)
+ GET /api/novedades?requiereAccion=1&porPagina=5 200 in 26ms (next.js: 3ms, application-code: 23ms)
+ GET /api/estadisticas 200 in 242ms (next.js: 74ms, application-code: 168ms)
+ GET /api/estadisticas 200 in 132ms (next.js: 2ms, application-code: 129ms)
+[?25h
+npm notice
+npm notice New minor version of npm available! 11.6.2 -> 11.21.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.1
+npm notice To update run: npm install -g npm@11.21.1
+npm notice
