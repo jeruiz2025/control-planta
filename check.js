@@ -1,1 +1,0 @@
-const {PrismaClient}=require('@prisma/client');const p=new PrismaClient();p.usuario.findMany({select:{id:true,usuario:true,nombre:true,rol:true,activo:true}}).then(r=>{console.log(JSON.stringify(r));return p.\();}).catch(e=>{console.error(e.message);process.exitCode=1;});
