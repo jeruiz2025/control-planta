@@ -26,6 +26,7 @@ model Persona {
   area            String    @default("")
   tipoInstitucion String    @default("")
   autoriza        Boolean   @default(true)
+  datosExtra      String    @default("{}")
   updatedAt       DateTime  @updatedAt
   novedades       Novedad[]
 

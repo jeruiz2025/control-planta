@@ -100,6 +100,7 @@ export async function buscarPersonas(
 ): Promise<ResultadoPaginado<ReturnType<typeof aPersonaDTO>>> {
   const filas = await prisma.persona.findMany({
     where: filtroPersona(params),
+    omit: { datosExtra: true },
     include: { _count: { select: { novedades: true } } },
   });
   let datos = filas.map(aPersonaDTO);
@@ -153,7 +154,7 @@ export async function buscarNovedades(
 
   const filas = await prisma.novedad.findMany({
     where: clausulas.length ? { AND: clausulas } : {},
-    include: { persona: true },
+    include: { persona: { omit: { datosExtra: true } } },
     orderBy: [{ fechaRegistro: "desc" }, { createdAt: "desc" }],
   });
   const datos = filas.map(aNovedadDTO);
@@ -215,8 +216,8 @@ const ORDEN_RANGOS = [
 
 export async function calcularEstadisticas(): Promise<Estadisticas> {
   const [filas, novedades] = await Promise.all([
-    prisma.persona.findMany(),
-    prisma.novedad.findMany({ include: { persona: true } }),
+    prisma.persona.findMany({ omit: { datosExtra: true } }),
+    prisma.novedad.findMany({ include: { persona: { omit: { datosExtra: true } } } }),
   ]);
   const personas = filas.map(aPersonaDTO);
 
@@ -527,10 +528,10 @@ export async function calcularEstadisticas(): Promise<Estadisticas> {
 
 export async function agregadoInstituciones(): Promise<InstitucionDTO[]> {
   const [filas, novedades] = await Promise.all([
-    prisma.persona.findMany(),
+    prisma.persona.findMany({ omit: { datosExtra: true } }),
     prisma.novedad.findMany({
       where: { requiereAccion: true },
-      include: { persona: true },
+      include: { persona: { omit: { datosExtra: true } } },
     }),
   ]);
   const mapa = new Map<string, InstitucionDTO>();

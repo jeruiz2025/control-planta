@@ -1,4 +1,5 @@
 import { alertaDeEdad, calcularEdad } from "./logica";
+import { parseDatosExtra } from "./datosExtra";
 import type { NovedadDTO, PersonaDTO, PersonaRegistro } from "./types";
 
 export function aPersonaDTO(p: PersonaRegistro): PersonaDTO {
@@ -22,6 +23,7 @@ export function aPersonaDTO(p: PersonaRegistro): PersonaDTO {
     area: p.area ?? "",
     tipoInstitucion: p.tipoInstitucion ?? "",
     autoriza: p.autoriza ?? true,
+    datosExtra: parseDatosExtra(p.datosExtra),
     edad,
     alerta: alertaDeEdad(edad),
     _count: p._count,

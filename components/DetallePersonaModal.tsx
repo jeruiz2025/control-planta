@@ -3,6 +3,11 @@
 import { useEffect, useState } from "react";
 import Modal from "@/components/Modal";
 import { api } from "@/lib/cliente";
+import {
+  camposConValor,
+  camposDesconocidos,
+  GRUPOS_DATOS_EXTRA,
+} from "@/lib/datosExtra";
 import type { NovedadDTO, PersonaDTO } from "@/lib/types";
 
 type Props = {
@@ -30,6 +35,59 @@ function Estado({ estado }: { estado: string }) {
     >
       {estado}
     </span>
+  );
+}
+
+function DatosCompletos({ datos }: { datos: Record<string, string> }) {
+  const grupos = GRUPOS_DATOS_EXTRA.map((grupo) => ({
+    nombre: grupo.nombre,
+    campos: camposConValor(grupo, datos),
+  })).filter((grupo) => grupo.campos.length > 0);
+  const otros = camposDesconocidos(datos);
+  const total = Object.keys(datos).length;
+  if (total === 0) return null;
+
+  return (
+    <details className="rounded-lg border border-slate-200 bg-slate-50/60">
+      <summary className="cursor-pointer select-none px-3 py-2 text-sm font-semibold text-slate-700">
+        Datos completos del Excel
+        <span className="ml-2 rounded-full bg-slate-200 px-2 py-0.5 text-[11px] font-medium text-slate-600">
+          {total} campos
+        </span>
+      </summary>
+      <div className="space-y-4 border-t border-slate-200 px-3 py-3">
+        {grupos.map((grupo) => (
+          <section key={grupo.nombre}>
+            <h4 className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-slate-500">
+              {grupo.nombre}
+            </h4>
+            <dl className="grid grid-cols-1 gap-x-4 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">
+              {grupo.campos.map((campo) => (
+                <div key={campo.clave} className="min-w-0">
+                  <dt className={etiqueta}>{campo.etiqueta}</dt>
+                  <dd className={`${valor} break-words`}>{datos[campo.clave]}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        ))}
+        {otros.length > 0 && (
+          <section>
+            <h4 className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-slate-500">
+              Otros datos
+            </h4>
+            <dl className="grid grid-cols-1 gap-x-4 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">
+              {otros.map((campo) => (
+                <div key={campo.clave} className="min-w-0">
+                  <dt className={etiqueta}>{campo.etiqueta}</dt>
+                  <dd className={`${valor} break-words`}>{datos[campo.clave]}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        )}
+      </div>
+    </details>
   );
 }
 
@@ -136,6 +194,8 @@ export default function DetallePersonaModal({
             <p className={valor}>{persona.novedadAnterior || "—"}</p>
           </div>
         </div>
+
+        <DatosCompletos datos={persona.datosExtra} />
 
         <div>
           <h3 className="mb-2 text-sm font-semibold text-slate-700">

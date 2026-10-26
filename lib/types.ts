@@ -17,6 +17,7 @@ export type PersonaRegistro = {
   area: string;
   tipoInstitucion: string;
   autoriza: boolean;
+  datosExtra?: string;
   updatedAt: Date;
   _count?: { novedades: number };
 };
@@ -40,6 +41,7 @@ export type PersonaDTO = {
   area: string;
   tipoInstitucion: string;
   autoriza: boolean;
+  datosExtra: Record<string, string>;
   edad: number | null;
   alerta: string;
   updatedAt: string;

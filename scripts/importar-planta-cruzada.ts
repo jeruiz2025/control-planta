@@ -46,6 +46,38 @@ function tipoInstitucion(institucion: string): "IE" | "CE" {
   return /CENT(RO)?\s+EDUC/i.test(institucion) ? "CE" : "IE";
 }
 
+/**
+ * Columnas que ya se guardan en campos propios de Persona o que son
+ * duplicados/derivados del Excel y no aportan información nueva.
+ */
+const COLUMNAS_EXCLUIDAS = new Set([
+  "ID",
+  "Municipio",
+  "Institución",
+  "Sede",
+  "Grupo",
+  "Cargo",
+  "Nombre",
+  "Cédula",
+  "Vinculación",
+  "Fecha nacimiento",
+  "Novedad (texto anterior)",
+  "DIRECCION",
+  "TELEFONO",
+  "EMAIL",
+  "NIVELDICTA",
+  "AREAEDUCATIVA",
+  // Duplicados o cálculos del Excel
+  "FECHAEXP",
+  "CIUDADEXP",
+  "FECHANACIMIENTO",
+  "CEDULA",
+  "EDAD",
+  "Edad",
+  "Alerta de edad",
+  "INSTITUCION",
+]);
+
 type FilaPersona = {
   id: number;
   municipio: string;
@@ -65,6 +97,7 @@ type FilaPersona = {
   area: string;
   tipoInstitucion: string;
   autoriza: boolean;
+  datosExtra: string;
 };
 
 async function main() {
@@ -82,6 +115,15 @@ async function main() {
   const val = (fila: ExcelJS.Row, nombre: string): unknown => {
     const c = columnas.get(nombre);
     return c ? fila.getCell(c).value : undefined;
+  };
+  const extra = (fila: ExcelJS.Row): Record<string, string> => {
+    const datos: Record<string, string> = {};
+    for (const [nombre, c] of columnas) {
+      if (COLUMNAS_EXCLUIDAS.has(nombre) || nombre.startsWith("Unnamed")) continue;
+      const contenido = limpiar(fila.getCell(c).value);
+      if (contenido) datos[nombre] = contenido;
+    }
+    return datos;
   };
   const requerida = (nombre: string) => {
     if (!columnas.has(nombre)) throw new Error(`Falta la columna "${nombre}" en Planta`);
@@ -148,6 +190,7 @@ async function main() {
       area: limpiar(val(f, "AREAEDUCATIVA")),
       tipoInstitucion: tipoInstitucion(institucion),
       autoriza: true,
+      datosExtra: JSON.stringify(extra(f)),
     });
   }
 
@@ -158,16 +201,29 @@ async function main() {
   const conCorreo = personas.filter((p) => p.correo).length;
   const conTelefono = personas.filter((p) => p.telefono).length;
   const conDireccion = personas.filter((p) => p.direccion).length;
+  const camposExtra = new Set<string>();
+  let totalCamposExtra = 0;
+  for (const p of personas) {
+    const datos = JSON.parse(p.datosExtra) as Record<string, string>;
+    totalCamposExtra += Object.keys(datos).length;
+    for (const clave of Object.keys(datos)) camposExtra.add(clave);
+  }
 
   console.log(`\nPersonas a importar: ${personas.length}`);
   console.log("Por grupo:", JSON.stringify(porGrupo));
   console.log(`Con correo: ${conCorreo} | con teléfono: ${conTelefono} | con dirección: ${conDireccion}`);
+  console.log(
+    `Datos completos: ${camposExtra.size} columnas distintas | ${
+      Math.round((totalCamposExtra / personas.length) * 10) / 10
+    } campos diligenciados por persona`
+  );
   if (descartadas.length) {
     console.log(`Descartadas (${descartadas.length}):`, JSON.stringify(descartadas.slice(0, 10)));
   }
   console.log("\nEjemplos mapeados:");
-  for (const p of personas.slice(0, 3)) {
-    console.log(JSON.stringify(p));
+  for (const p of personas.slice(0, 2)) {
+    const { datosExtra, ...resto } = p;
+    console.log(JSON.stringify({ ...resto, datosExtra: JSON.parse(datosExtra) }));
   }
 
   const actuales = await prisma.persona.count();

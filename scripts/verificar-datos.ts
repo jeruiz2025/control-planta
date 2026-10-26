@@ -26,6 +26,7 @@ async function main() {
       correo: true,
       telefono: true,
       direccion: true,
+      datosExtra: true,
     },
   });
 
@@ -38,6 +39,9 @@ async function main() {
   let sinDireccion = 0;
   let ie = 0;
   let ce = 0;
+  let conDatosExtra = 0;
+  let totalCamposExtra = 0;
+  const columnasExtra = new Set<string>();
   for (const p of personas) {
     const edad = calcularEdad(p.fechaNacimiento);
     if (edad !== null && edad >= 65) m65++;
@@ -49,6 +53,15 @@ async function main() {
     if (!p.direccion) sinDireccion++;
     if (p.tipoInstitucion === "IE") ie++;
     if (p.tipoInstitucion === "CE") ce++;
+    try {
+      const extra = JSON.parse(p.datosExtra) as Record<string, string>;
+      const claves = Object.keys(extra);
+      if (claves.length) conDatosExtra++;
+      totalCamposExtra += claves.length;
+      for (const clave of claves) columnasExtra.add(clave);
+    } catch {
+      // registro sin JSON válido
+    }
   }
 
   console.log(
@@ -67,6 +80,9 @@ async function main() {
         sinDireccion,
         tipoIE: ie,
         tipoCE: ce,
+        conDatosExtra,
+        columnasExtra: columnasExtra.size,
+        promedioCamposExtra: Math.round((totalCamposExtra / total) * 10) / 10,
       },
       null,
       2
