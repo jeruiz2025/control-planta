@@ -11,7 +11,9 @@
     "db:migrate": "prisma migrate dev",
     "db:importar": "tsx scripts/importar.ts",
     "db:studio": "prisma studio",
-    "db:admin": "tsx scripts/crear-admin.ts"
+    "db:admin": "tsx scripts/crear-admin.ts",
+    "db:importar:planta": "tsx scripts/importar-planta-cruzada.ts",
+    "db:verificar": "tsx scripts/verificar-datos.ts"
   },
   "prisma": {
     "seed": "tsx scripts/importar.ts"
