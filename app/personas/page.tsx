@@ -5,6 +5,8 @@ import DetallePersonaModal from "@/components/DetallePersonaModal";
 import NovedadModal from "@/components/NovedadModal";
 import PersonaModal from "@/components/PersonaModal";
 import { generarActaPosesion } from "@/lib/actaPosesion";
+import { generarCartaAceptacion } from "@/lib/cartaAceptacion";
+import { generarCartaPresentacion } from "@/lib/cartaPresentacion";
 import { api } from "@/lib/cliente";
 import type {
   Catalogos,
@@ -80,6 +82,8 @@ export default function PersonasPage() {
   const [alta, setAlta] = useState(false);
   const [novedadDe, setNovedadDe] = useState<PersonaDTO | null>(null);
   const [generandoAp, setGenerandoAp] = useState<number | null>(null);
+  const [generandoCa, setGenerandoCa] = useState<number | null>(null);
+  const [generandoCp, setGenerandoCp] = useState<number | null>(null);
 
   useEffect(() => {
     api<Catalogos>("/api/catalogos").then(setCatalogos).catch(() => undefined);
@@ -384,20 +388,24 @@ export default function PersonasPage() {
                                  body: JSON.stringify({ clave: "actaPosesion" }),
                                }
                              );
+                             const detalle = await api<PersonaDTO>(`/api/personas/${p.id}`);
+                             let elaboradoPor = null;
+                             if (typeof window !== "undefined") {
+                               const nombreElaboro = window.prompt("Nombre de quien elabora el acta:");
+                               if (nombreElaboro && nombreElaboro.trim()) {
+                                 elaboradoPor = nombreElaboro.trim();
+                               }
+                             }
                              await generarActaPosesion({
                                numero: valor,
-                               nombre: p.nombre,
-                               cedula: p.cedula,
-                               direccion: p.direccion,
-                               municipio: p.municipio,
-                               telefono: p.telefono,
-                               correo: p.correo,
-                               autoriza: p.autoriza,
-                               cargo: p.cargo,
-                               nivel: p.nivel,
-                               area: p.area,
-                               tipoInstitucion: p.tipoInstitucion === "IE" || p.tipoInstitucion === "CE" ? p.tipoInstitucion : null,
-                               institucion: p.institucion,
+                               nombre: detalle.nombre,
+                               cedula: detalle.cedula,
+                               municipio: detalle.municipio,
+                               institucion: detalle.institucion,
+                               cargo: detalle.cargo,
+                               fechaNacimiento: detalle.fechaNacimiento,
+                               datosExtra: detalle.datosExtra,
+                               elaboradoPor,
                              });
                            } catch {
                              alert("No se pudo generar el PDF AP");

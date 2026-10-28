@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+﻿import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { aISO } from "@/lib/logica";
 import { aNovedadDTO, aPersonaDTO } from "@/lib/serializacion";
@@ -70,7 +70,7 @@ export async function PUT(req: NextRequest, ctx: RouteContext<"/api/personas/[id
       });
       if (duplicada) {
         return Response.json(
-          { error: `Ya existe otra persona con la cédula ${datos.cedula}` },
+          { error: `Ya existe otra persona con la cÃ©dula ${datos.cedula}` },
           { status: 409 }
         );
       }
@@ -80,6 +80,21 @@ export async function PUT(req: NextRequest, ctx: RouteContext<"/api/personas/[id
     }
     const data: Record<string, string | boolean> = { ...datos };
     if (body.autoriza !== undefined) data.autoriza = Boolean(body.autoriza);
+    if (body.datosExtra !== undefined && body.datosExtra !== null) {
+      try {
+        if (typeof body.datosExtra === "string") {
+          data.datosExtra = body.datosExtra;
+        } else if (typeof body.datosExtra === "object") {
+          const limpio: Record<string, string> = {};
+          for (const [clave, valor] of Object.entries(body.datosExtra as Record<string, unknown>)) {
+            if (valor === null || valor === undefined) continue;
+            const texto = String(valor).trim();
+            if (texto) limpio[clave] = texto;
+          }
+          data.datosExtra = JSON.stringify(limpio);
+        }
+      } catch {}
+    }
     const actualizada = await prisma.persona.update({ where: { id }, data });
     return Response.json(aPersonaDTO(actualizada));
   } catch (e) {
@@ -102,3 +117,4 @@ export async function DELETE(_req: NextRequest, ctx: RouteContext<"/api/personas
     return Response.json({ error: "No se pudo eliminar la persona" }, { status: 500 });
   }
 }
+

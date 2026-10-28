@@ -1,9 +1,10 @@
-"use client";
+﻿"use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Modal from "@/components/Modal";
 import { api } from "@/lib/cliente";
 import { alertaDeEdad, calcularEdad } from "@/lib/logica";
+import { ETIQUETAS_DATOS_EXTRA, GRUPOS_DATOS_EXTRA } from "@/lib/datosExtra";
 import type { Catalogos, PersonaDTO } from "@/lib/types";
 
 type Props = {
@@ -42,11 +43,19 @@ export default function PersonaModal({
     tipoInstitucion: persona?.tipoInstitucion ?? "",
     autoriza: persona?.autoriza ?? true,
   });
+  const [extra, setExtra] = useState<Record<string, string>>(
+    persona?.datosExtra ?? {}
+  );
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState("");
 
   const set = (campo: keyof typeof form, valor: string | boolean) =>
     setForm((f) => ({ ...f, [campo]: valor }));
+
+  const setExtraCampo = (clave: string, valor: string) =>
+    setExtra((e) => ({ ...e, [clave]: valor }));
+
+const clavesTodas = new Set(GRUPOS_DATOS_EXTRA.flatMap((g) => g.campos.map((c) => c.clave)));
 
   const edad = calcularEdad(form.fechaNacimiento);
   const alerta = alertaDeEdad(edad);
@@ -59,11 +68,11 @@ export default function PersonaModal({
       const datos = persona
         ? await api<PersonaDTO>(`/api/personas/${persona.id}`, {
             method: "PUT",
-            body: JSON.stringify(form),
+            body: JSON.stringify({ ...form, datosExtra: extra }),
           })
         : await api<PersonaDTO>("/api/personas", {
             method: "POST",
-            body: JSON.stringify(form),
+            body: JSON.stringify({ ...form, datosExtra: extra }),
           });
       onGuardado(datos);
     } catch (err) {
@@ -75,7 +84,7 @@ export default function PersonaModal({
 
   return (
     <Modal
-      titulo={persona ? `Editar · ${persona.nombre || "(sin nombre)"}` : "Alta en la planta"}
+      titulo={persona ? `Editar Â· ${persona.nombre || "(sin nombre)"}` : "Alta en la planta"}
       onCerrar={onCerrar}
     >
       <form onSubmit={guardar} className="space-y-3">
@@ -95,7 +104,7 @@ export default function PersonaModal({
           </div>
           <div>
             <label className={etiqueta} htmlFor="cedula">
-              Cédula
+              CÃ©dula
             </label>
             <input
               id="cedula"
@@ -140,7 +149,7 @@ export default function PersonaModal({
           </div>
           <div>
             <label className={etiqueta} htmlFor="institucion">
-              Institución
+              InstituciÃ³n
             </label>
             <input
               id="institucion"
@@ -185,7 +194,7 @@ export default function PersonaModal({
           </div>
           <div>
             <label className={etiqueta} htmlFor="vinculacion">
-              Vinculación
+              VinculaciÃ³n
             </label>
             <select
               id="vinculacion"
@@ -193,7 +202,7 @@ export default function PersonaModal({
               value={form.vinculacion}
               onChange={(e) => set("vinculacion", e.target.value)}
             >
-              <option value="">—</option>
+              <option value="">â€”</option>
               {catalogos.vinculaciones.map((v) => (
                 <option key={v} value={v}>
                   {v}
@@ -216,7 +225,7 @@ export default function PersonaModal({
           <div className="rounded-md bg-slate-50 px-3 py-2">
             <p className="text-xs font-medium text-slate-500">Edad calculada</p>
             <p className="text-sm font-semibold text-slate-800">
-              {edad !== null ? `${edad} años` : "—"}
+              {edad !== null ? `${edad} aÃ±os` : "â€”"}
             </p>
             {alerta && (
               <p className="text-[11px] font-medium text-rose-600">{alerta}</p>
@@ -235,7 +244,7 @@ export default function PersonaModal({
           </div>
           <div className="sm:col-span-2">
             <label className={etiqueta} htmlFor="direccion">
-              Dirección
+              DirecciÃ³n
             </label>
             <input
               id="direccion"
@@ -246,7 +255,7 @@ export default function PersonaModal({
           </div>
           <div>
             <label className={etiqueta} htmlFor="telefono">
-              Teléfono celular
+              TelÃ©fono celular
             </label>
             <input
               id="telefono"
@@ -257,7 +266,7 @@ export default function PersonaModal({
           </div>
           <div>
             <label className={etiqueta} htmlFor="correo">
-              Correo electrónico
+              Correo electrÃ³nico
             </label>
             <input
               id="correo"
@@ -279,14 +288,14 @@ export default function PersonaModal({
               onChange={(e) => set("nivel", e.target.value)}
             />
             <datalist id="lista-niveles">
-              {["Preescolar", "Básica primaria", "Básica secundaria", "Media técnica", "Media académica"].map((n) => (
+              {["Preescolar", "BÃ¡sica primaria", "BÃ¡sica secundaria", "Media tÃ©cnica", "Media acadÃ©mica"].map((n) => (
                 <option key={n} value={n} />
               ))}
             </datalist>
           </div>
           <div>
             <label className={etiqueta} htmlFor="area">
-              Área
+              Ãrea
             </label>
             <input
               id="area"
@@ -305,8 +314,8 @@ export default function PersonaModal({
               value={form.tipoInstitucion}
               onChange={(e) => set("tipoInstitucion", e.target.value)}
             >
-              <option value="">—</option>
-              <option value="IE">Institución Educativa (IE)</option>
+              <option value="">â€”</option>
+              <option value="IE">InstituciÃ³n Educativa (IE)</option>
               <option value="CE">Centro Educativo (CE)</option>
             </select>
           </div>
@@ -318,8 +327,48 @@ export default function PersonaModal({
               onChange={(e) => set("autoriza", e.target.checked)}
             />
             <label className="text-xs text-slate-600" htmlFor="autoriza">
-              Autoriza notificación por correo
+              Autoriza notificaciÃ³n por correo
             </label>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-slate-700">Datos completos del Excel</h3>
+            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] text-slate-500">
+              {Object.keys(extra).length} campos
+            </span>
+          </div>
+          <div className="space-y-4 rounded-lg border border-slate-200 bg-slate-50/40 p-3">
+            {GRUPOS_DATOS_EXTRA.map((grupo: any) => (
+              <section key={grupo.nombre}>
+                <h4 className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-slate-500">{grupo.nombre}</h4>
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                  {grupo.campos.map((c: any) => (
+                    <div key={c.clave}>
+                      <label className={etiqueta} htmlFor={`extra-${c.clave}`}>{ETIQUETAS_DATOS_EXTRA[c.clave] ?? c.etiqueta}</label>
+                      <input id={`extra-${c.clave}`} className={campoBase} value={extra[c.clave] ?? ""} onChange={(e) => setExtraCampo(c.clave, e.target.value)} />
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ))}
+            {Object.keys(extra).filter((k) => !clavesTodas.has(k)).length > 0 && (
+              <section>
+                <h4 className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-slate-500">Otros datos</h4>
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                  {Object.keys(extra)
+                    .filter((k) => !clavesTodas.has(k))
+                    .sort((a, b) => a.localeCompare(b, "es"))
+                    .map((clave) => (
+                      <div key={clave}>
+                        <label className={etiqueta} htmlFor={`extra-otro-${clave}`}>{clave}</label>
+                        <input id={`extra-otro-${clave}`} className={campoBase} value={extra[clave] ?? ""} onChange={(e) => setExtraCampo(clave, e.target.value)} />
+                      </div>
+                    ))}
+                </div>
+              </section>
+            )}
           </div>
         </div>
 
@@ -342,10 +391,12 @@ export default function PersonaModal({
             disabled={guardando}
             className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
           >
-            {guardando ? "Guardando…" : "Guardar"}
+            {guardando ? "Guardandoâ€¦" : "Guardar"}
           </button>
         </div>
       </form>
     </Modal>
   );
 }
+
+
