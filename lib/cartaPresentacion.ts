@@ -132,6 +132,8 @@ export function construirCartaPresentacion(
     cargo.toUpperCase().includes("DOCENTE") ||
     cargo.toUpperCase().includes("MAESTRO") ||
     cargo.toUpperCase().includes("PROFESOR");
+  const telefono = obtener(extra, ["TELEFONOMOVIL", "TELEFONO MOVIL", "CELULAR", "TELEFONO"]);
+  const correo = obtener(extra, ["CORREO", "EMAIL", "CORREO ELECTRONICO", "CORREO ELECTRÓNICO"]);
   const elaboradoPor = valor(datos.elaboradoPor, "________________");
   const fecha = fechaLarga(new Date());
 
@@ -170,8 +172,28 @@ export function construirCartaPresentacion(
         { text: municipio, bold: true },
       ],
       style: "parrafo",
-      margin: [0, 0, 0, 18],
+      margin: [0, 0, 0, 10],
     },
+    ...(telefono || correo
+      ? [
+          {
+            text: [
+              "Teléfono celular: ",
+              { text: valor(telefono), bold: true },
+            ],
+            style: "parrafo",
+            margin: [0, 0, 0, 4],
+          },
+          {
+            text: [
+              "Correo electrónico: ",
+              { text: valor(correo), bold: true },
+            ],
+            style: "parrafo",
+            margin: [0, 0, 0, 12],
+          },
+        ]
+      : []),
     {
       text: "Asunto: Presentación para toma de posesión",
       style: "parrafo",
