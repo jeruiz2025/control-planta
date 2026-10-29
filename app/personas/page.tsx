@@ -408,7 +408,7 @@ export default function PersonasPage() {
                                elaboradoPor,
                              });
                            } catch {
-                             alert("No se pudo generar el PDF AP");
+                             alert("No se pudo generar el Acta de Posesión");
                            } finally {
                              setGenerandoAp(null);
                            }
@@ -416,6 +416,100 @@ export default function PersonasPage() {
                          className="mr-1 rounded border border-indigo-300 px-2 py-0.5 text-[11px] text-indigo-700 hover:bg-indigo-50 disabled:opacity-50"
                        >
                          {generandoAp === p.id ? "Generando…" : "AP"}
+                       </button>
+                       <button
+                         type="button"
+                         disabled={generandoCa === p.id}
+                         onClick={async () => {
+                           setGenerandoCa(p.id);
+                           try {
+                             const detalle = await api<PersonaDTO>(`/api/personas/${p.id}`);
+                             const grupo = (detalle.grupo || "").toUpperCase();
+                             const vinculacion = (detalle.vinculacion || "").toUpperCase();
+                             const cargoU = (detalle.cargo || "").toUpperCase();
+                             const esDocente =
+                               grupo.includes("DOC") ||
+                               vinculacion.includes("DOC") ||
+                               cargoU.includes("DOCENTE") ||
+                               cargoU.includes("MAESTRO") ||
+                               cargoU.includes("PROFESOR");
+                             let profesionalRrhh = null;
+                             if (typeof window !== "undefined") {
+                               profesionalRrhh = window.localStorage.getItem("cp_profesional_rrhh");
+                               if (!profesionalRrhh) {
+                                 const nombreProfesional = window.prompt("Nombre del Profesional Universitario RRHH:");
+                                 if (nombreProfesional && nombreProfesional.trim()) {
+                                   profesionalRrhh = nombreProfesional.trim();
+                                   window.localStorage.setItem("cp_profesional_rrhh", profesionalRrhh);
+                                 }
+                               }
+                             }
+                             await generarCartaAceptacion({
+                               nombre: detalle.nombre,
+                               cedula: detalle.cedula,
+                               municipio: detalle.municipio,
+                               institucion: detalle.institucion,
+                               cargo: detalle.cargo,
+                               grupo: detalle.grupo,
+                               vinculacion: detalle.vinculacion,
+                               datosExtra: detalle.datosExtra,
+                               elaboradoPor: profesionalRrhh,
+                               tipo: esDocente ? "DOCENTE" : "ADMINISTRATIVO",
+                             });
+                           } catch {
+                             alert("No se pudo generar la Carta de Aceptación");
+                           } finally {
+                             setGenerandoCa(null);
+                           }
+                         }}
+                         className="mr-1 rounded border border-emerald-300 px-2 py-0.5 text-[11px] text-emerald-700 hover:bg-emerald-50 disabled:opacity-50"
+                       >
+                         {generandoCa === p.id ? "Generando…" : "CA"}
+                       </button>
+                       <button
+                         type="button"
+                         disabled={generandoCp === p.id}
+                         onClick={async () => {
+                           setGenerandoCp(p.id);
+                           try {
+                             const detalle = await api<PersonaDTO>(`/api/personas/${p.id}`);
+                             const grupo = (detalle.grupo || "").toUpperCase();
+                             const vinculacion = (detalle.vinculacion || "").toUpperCase();
+                             const cargoU = (detalle.cargo || "").toUpperCase();
+                             const esDocente =
+                               grupo.includes("DOC") ||
+                               vinculacion.includes("DOC") ||
+                               cargoU.includes("DOCENTE") ||
+                               cargoU.includes("MAESTRO") ||
+                               cargoU.includes("PROFESOR");
+                             let elaboradoPor = null;
+                             if (typeof window !== "undefined") {
+                               const nombreElaboro = window.prompt("Nombre de quien elabora la carta de presentación:");
+                               if (nombreElaboro && nombreElaboro.trim()) {
+                                 elaboradoPor = nombreElaboro.trim();
+                               }
+                             }
+                             await generarCartaPresentacion({
+                               nombre: detalle.nombre,
+                               cedula: detalle.cedula,
+                               municipio: detalle.municipio,
+                               institucion: detalle.institucion,
+                               cargo: detalle.cargo,
+                               grupo: detalle.grupo,
+                               vinculacion: detalle.vinculacion,
+                               datosExtra: detalle.datosExtra,
+                               elaboradoPor,
+                               tipo: esDocente ? "DOCENTE" : "ADMINISTRATIVO",
+                             });
+                           } catch {
+                             alert("No se pudo generar la Carta de Presentación");
+                           } finally {
+                             setGenerandoCp(null);
+                           }
+                         }}
+                         className="mr-1 rounded border border-amber-300 px-2 py-0.5 text-[11px] text-amber-700 hover:bg-amber-50 disabled:opacity-50"
+                       >
+                         {generandoCp === p.id ? "Generando…" : "CP"}
                        </button>
                        <button
                          type="button"
