@@ -356,8 +356,8 @@ export async function generarCartaPresentacion(
   pdfMake.addVirtualFileSystem(vfs);
 
   const [encabezado, pie] = await Promise.all([
-    cargarImagen("/EAC.png"),
-    cargarImagen("/PAC.png"),
+    cargarImagen("/ECP1.png"),
+    cargarImagen("/PCP1.png"),
   ]);
 
   const docDefinition = construirCartaPresentacion(datos, { encabezado, pie });
